@@ -1,0 +1,19 @@
+{
+  "Emulators": [
+    {
+      "Name": "ZSNES",
+      "Type": "ZSNES",
+      "Path": "C:\\Emuladores\\ZSNES\\zsnesw.exe"
+    },
+    {
+      "Name": "Snes9x",
+      "Type": "Snes9x",
+      "Path": "C:\\Emuladores\\Snes9x\\snes9x.exe"
+    },
+    {
+      "Name": "RetroArch",
+      "Type": "RetroArch",
+      "Path": "C:\\Emuladores\\RetroArch\\retroarch.exe"
+    }
+  ]
+}
