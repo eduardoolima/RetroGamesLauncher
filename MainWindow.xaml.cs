@@ -2,11 +2,13 @@
 using RetroGamesLauncher.Data.Repositories;
 using RetroGamesLauncher.Models;
 using RetroGamesLauncher.Services;
+using RetroGamesLauncher.Views;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -19,20 +21,38 @@ namespace RetroGamesLauncher
     {
         private GameInfo selectedGame = null; // Armazena o jogo atual
         private readonly IGameRepository _gameRepository;
+        private GlobalHotkeyManager _hotkeyManager;
 
         public MainWindow(IGameRepository gameRepository)
         {
             _gameRepository = gameRepository;
             InitializeComponent();
             LoadGameList();
+            Loaded += Window_Loaded;
             Closing += MainWindow_Closing;
         }
-
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            var helper = new WindowInteropHelper(this);
+            _hotkeyManager = new GlobalHotkeyManager(helper.Handle);
+            _hotkeyManager.HotkeyPressed += HotkeyManager_HotkeyPressed;
+        }
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            //_emulatorManager.CleanupExtractedEmulators();
+            _hotkeyManager?.Dispose();
         }
 
+        private void ShowTemporaryNotification(string message)
+        {
+            var toast = new ToastWindow(message);
+            toast.Show();
+        }
+
+        private void HotkeyManager_HotkeyPressed(object sender, EventArgs e)
+        {
+            if(selectedGame != null)
+                EmulatorManager.CloseEmulator();
+        }
 
         private void LoadGameList()
         {           
@@ -86,11 +106,13 @@ namespace RetroGamesLauncher
             // Aqui você pode também adicionar botão para jogar
         }
 
-        private void BtnPlayButton_Click(object sender, RoutedEventArgs e)
+        private async void BtnPlayButton_Click(object sender, RoutedEventArgs e)
         {           
             if (selectedGame == null) return;
 
             EmulatorManager.LaunchEmulator(selectedGame.EmulatorId, selectedGame.RomPath);
+            await Task.Delay(2500);
+            ShowTemporaryNotification("Pressione Shift + Esc para fechar o emulador");
 
         }
 
