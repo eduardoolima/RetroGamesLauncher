@@ -1,11 +1,6 @@
-﻿using RetroGamesLauncher.Data;
-using RetroGamesLauncher.Data.Repositories;
+﻿using RetroGamesLauncher.Data.Repositories;
 using RetroGamesLauncher.Models;
 using RetroGamesLauncher.Services;
-using RetroGamesLauncher.Views;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
@@ -40,13 +35,7 @@ namespace RetroGamesLauncher
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             _hotkeyManager?.Dispose();
-        }
-
-        private void ShowTemporaryNotification(string message)
-        {
-            var toast = new ToastWindow(message);
-            toast.Show();
-        }
+        }        
 
         private void HotkeyManager_HotkeyPressed(object sender, EventArgs e)
         {
@@ -63,9 +52,10 @@ namespace RetroGamesLauncher
                 {
                     var panel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 5, 0, 5) };
 
+                    var imgPath = AppDomain.CurrentDomain.BaseDirectory + game.ImagePath;
                     var img = new Image
                     {
-                        Source = new BitmapImage(new Uri(game.ImagePath, UriKind.Relative)),
+                        Source = new BitmapImage(new Uri(imgPath, UriKind.Absolute)),
                         Width = 60,
                         Height = 60,
                         Margin = new Thickness(5)
@@ -98,7 +88,8 @@ namespace RetroGamesLauncher
         {
             selectedGame = game;
 
-            ImgMainImage.Source = new BitmapImage(new Uri(game.ScreenshotPath, UriKind.Relative));
+            var imgPath = AppDomain.CurrentDomain.BaseDirectory + game.ScreenshotPath;
+            ImgMainImage.Source = new BitmapImage(new Uri(imgPath, UriKind.Absolute));
             TxtGameTitle.Text = game.Title;
             TxtGameDescription.Text = game.Description;
 
@@ -106,15 +97,16 @@ namespace RetroGamesLauncher
             // Aqui você pode também adicionar botão para jogar
         }
 
-        private async void BtnPlayButton_Click(object sender, RoutedEventArgs e)
+        private void BtnPlayButton_Click(object sender, RoutedEventArgs e)
         {           
             if (selectedGame == null) return;
-
+            
             EmulatorManager.LaunchEmulator(selectedGame.EmulatorId, selectedGame.RomPath);
-            await Task.Delay(2500);
-            ShowTemporaryNotification("Pressione Shift + Esc para fechar o emulador");
+            //await Task.Delay(2500);
+            //ShowTemporaryNotification("Pressione Shift + Esc para fechar o emulador");
 
         }
+
 
     }
 }
