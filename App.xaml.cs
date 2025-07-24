@@ -5,6 +5,7 @@ using RetroGamesLauncher.Data.Repositories;
 using RetroGamesLauncher.Models;
 using RetroGamesLauncher.Models.Enums;
 using RetroGamesLauncher.Services;
+using RetroGamesLauncher.Views;
 using System.Runtime.InteropServices.JavaScript;
 using System.Windows;
 

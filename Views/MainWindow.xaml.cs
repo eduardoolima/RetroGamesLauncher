@@ -3,11 +3,12 @@ using RetroGamesLauncher.Models;
 using RetroGamesLauncher.Services;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace RetroGamesLauncher
+namespace RetroGamesLauncher.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -42,6 +43,40 @@ namespace RetroGamesLauncher
             if(selectedGame != null)
                 EmulatorManager.CloseEmulator();
         }
+
+        //private void TitleBar_MouseDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    if (e.ChangedButton == MouseButton.Left)
+        //        DragMove(); // permite mover a janela
+        //}
+
+        //private void Minimize_Click(object sender, RoutedEventArgs e)
+        //{
+        //    WindowState = WindowState.Minimized;
+        //}
+
+        //private void MaximizeRestore_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (WindowState == WindowState.Maximized)
+        //        WindowState = WindowState.Normal;
+        //    else
+        //        WindowState = WindowState.Maximized;
+        //}
+
+        //private void Close_Click(object sender, RoutedEventArgs e)
+        //{
+        //    Close();
+        //}
+
+        //// Visual extra: muda a cor do botão fechar ao passar o mouse
+        //private void Close_MouseEnter(object sender, MouseEventArgs e)
+        //{
+        //    (sender as Button).Background = Brushes.Red;
+        //}
+        //private void Close_MouseLeave(object sender, MouseEventArgs e)
+        //{
+        //    (sender as Button).Background = Brushes.Transparent;
+        //}
 
         private void LoadGameList()
         {           
