@@ -1,14 +1,12 @@
 ﻿using RetroGamesLauncher.Views;
 
-namespace RetroGamesLauncher.Services
+namespace RetroGamesLauncher.Services;
+public static class ToastMessages
 {
-    public static class ToastMessages
+    public static void ShowTemporaryNotification(string message)
     {
-        public static void ShowTemporaryNotification(string message)
-        {
-            var toast = new ToastWindow(message);
-            toast.Activate();
-            toast.Show();
-        }
+        var toast = new ToastWindow(message);
+        toast.Activate();
+        toast.Show();
     }
 }

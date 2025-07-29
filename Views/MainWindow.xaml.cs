@@ -1,6 +1,9 @@
 ﻿using RetroGamesLauncher.Data.Repositories;
 using RetroGamesLauncher.Models;
+using RetroGamesLauncher.Models.ViewModels;
 using RetroGamesLauncher.Services;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
@@ -14,6 +17,8 @@ namespace RetroGamesLauncher.Views;
 /// </summary>
 public partial class MainWindow : Window
 {
+    #region Fields
+
     private GameInfo selectedGame = null; // Armazena o jogo atual
     private readonly IGameRepository _gameRepository;
     private GlobalHotkeyManager _hotkeyManager;
@@ -21,8 +26,19 @@ public partial class MainWindow : Window
     private bool _isPnlActionsExpanded = false;
     private double _collapsedHeightPnlActions = 40; // Altura mínima quando colapsado
     private double _expandedHeightPnlActions;       // Variável para armazenar a altura dinâmica
+
+    private int _currentPage = 1;
+    private int _totalGamesCount;
+
     // Variável para armazenar o token de cancelamento da busca
     private CancellationTokenSource _searchCancellationTokenSource;
+
+    ObservableCollection<GameViewModel> _visibleGames = new();
+    const int _pageSize = 15;
+
+    #endregion
+
+    #region Constructor
 
     public MainWindow(IGameRepository gameRepository)
     {
@@ -33,7 +49,10 @@ public partial class MainWindow : Window
         Closing += MainWindow_Closing;
     }
 
+    #endregion
+
     #region WindowActions
+
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         var helper = new WindowInteropHelper(this);
@@ -48,61 +67,93 @@ public partial class MainWindow : Window
 
         PnlActions.Height = _collapsedHeightPnlActions;
     }
+
     private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
         _hotkeyManager?.Dispose();
     }
+
+    #endregion
+
+    #region GameList
+
     /// <summary>
     /// Carrega a lista de jogos do repositório e exibe na interface.
     /// </summary>
     private void LoadGameList()
     {
-        var games = _gameRepository.GetAll();
-        foreach (var game in games)
+        _totalGamesCount = _gameRepository.GetTotalCount();
+        LoadNextPage();
+        
+        GameListBox.ItemsSource = _visibleGames;
+
+        GameListBox.Loaded += (s, e) =>
         {
-            try
+            var scrollViewer = GetScrollViewer(GameListBox);
+            if (scrollViewer != null)
             {
-                var panel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 5, 0, 5) };
-
-                var imgPath = AppDomain.CurrentDomain.BaseDirectory + game.ImagePath;
-                var img = new Image
-                {
-                    Source = new BitmapImage(new Uri(imgPath, UriKind.Absolute)),
-                    Width = 60,
-                    Height = 60,
-                    Margin = new Thickness(5)
-                };
-
-                var label = new TextBlock
-                {
-                    Text = game.Title,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Foreground = Brushes.White,
-                    Margin = new Thickness(10, 0, 0, 0),
-                    FontSize = 16
-                };
-
-                panel.Children.Add(img);
-                panel.Children.Add(label);
-                panel.MouseEnter += (s, e) =>
-                {
-                    panel.Background = new SolidColorBrush(Color.FromArgb(50, 255, 255, 255));
-                };
-                panel.MouseLeave += (s, e) =>
-                {
-                    panel.Background = Brushes.Transparent;
-                };
-                panel.MouseLeftButtonUp += (s, e) => DisplayGame(game);
-
-                PnlGameList.Children.Add(panel);
+                scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
             }
-            catch (Exception)
+            else
             {
-
-                throw;
+                Debug.WriteLine("ScrollViewer ainda é null após Loaded");
             }
+        };
+    }
+
+    private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+    {
+        var scrollViewer = (ScrollViewer)sender;
+        if (scrollViewer.VerticalOffset + scrollViewer.ViewportHeight >= scrollViewer.ExtentHeight - _pageSize)
+        {
+            LoadNextPage();
         }
     }
+
+    private async void LoadNextPage()
+    {
+        if ((_currentPage - 1) * _pageSize >= _totalGamesCount)
+            return;
+
+        var page = await _gameRepository.GetByPaging(_currentPage, _pageSize);
+        foreach (var game in page)
+        {
+            _visibleGames.Add(new GameViewModel
+            {
+                Title = game.Title,
+                ImageSource = new BitmapImage(new Uri(AppDomain.CurrentDomain.BaseDirectory + game.ImagePath)),
+                Game = game
+            });
+        }
+
+        _currentPage++;
+    }
+
+    private void GameListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (GameListBox.SelectedItem is GameViewModel selectedVm)
+        {
+            DisplayGame(selectedVm.Game);
+        }
+    }
+
+    private ScrollViewer GetScrollViewer(DependencyObject depObj)
+    {
+        if (depObj is ScrollViewer) return (ScrollViewer)depObj;
+
+        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+        {
+            var child = VisualTreeHelper.GetChild(depObj, i);
+            var result = GetScrollViewer(child);
+            if (result != null) return result;
+        }
+        return null;
+    }
+
+    #endregion
+
+    #region GameDisplay
+
     /// <summary>
     /// Exibe as informações do jogo selecionado na interface.
     /// </summary>
@@ -118,6 +169,11 @@ public partial class MainWindow : Window
 
         BtnPlayButton.Visibility = Visibility.Visible;
     }
+
+    #endregion
+
+    #region Search
+
     private async void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         _searchCancellationTokenSource?.Cancel();
@@ -152,14 +208,17 @@ public partial class MainWindow : Window
             MessageBox.Show($"Ocorreu um erro na busca: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
+
     #endregion
 
     #region ButtonsAndHotkeys
+
     private void HotkeyManager_HotkeyPressed(object sender, EventArgs e)
     {
         if (selectedGame != null)
             EmulatorManager.CloseEmulator();
     }
+
     private void TogglePanel_Click(object sender, RoutedEventArgs e)
     {
         var animation = new DoubleAnimation
@@ -175,6 +234,7 @@ public partial class MainWindow : Window
         _isPnlActionsExpanded = !_isPnlActionsExpanded;
         BtnTogglePanel.Content = _isPnlActionsExpanded ? "⎯" : "☰";
     }
+
     private void BtnPlayButton_Click(object sender, RoutedEventArgs e)
     {
         if (selectedGame == null) return;
@@ -182,9 +242,7 @@ public partial class MainWindow : Window
         EmulatorManager.LaunchEmulator(selectedGame.EmulatorId, selectedGame.RomPath);
         //await Task.Delay(2500);
         //ShowTemporaryNotification("Pressione Shift + Esc para fechar o emulador");
-
     }
-    #endregion
 
     private void BtnAddGame_Click(object sender, RoutedEventArgs e)
     {
@@ -195,4 +253,6 @@ public partial class MainWindow : Window
     {
 
     }
+
+    #endregion
 }

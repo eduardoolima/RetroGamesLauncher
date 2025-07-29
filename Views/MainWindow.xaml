@@ -186,11 +186,77 @@
 
 
                     <!-- Conteúdo rolável -->
-                    <ScrollViewer Grid.Row="1"
+                    <ListBox x:Name="GameListBox"
+                        Grid.Row="1"
+                        Background="#2e2e2e"
+                        BorderThickness="0"
+                        Foreground="White"
+                        ScrollViewer.VerticalScrollBarVisibility="Auto"
+                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                        VirtualizingStackPanel.IsVirtualizing="True"
+                        VirtualizingStackPanel.VirtualizationMode="Recycling"
+                        ScrollViewer.CanContentScroll="True"
+                        HorizontalContentAlignment="Stretch"
+                        SelectionChanged="GameListBox_SelectionChanged"
+                        >
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Padding" Value="5"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="Bd"
+                                                    Background="{TemplateBinding Background}"
+                                                    SnapsToDevicePixels="true">
+                                                <ContentPresenter 
+                                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Bd" Property="Background" Value="#3a3a3a" />
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="Bd" Property="Background" Value="#33AAAAAA" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Image Source="{Binding ImageSource}" Width="60" Height="60" Margin="5"/>
+                                    <TextBlock Grid.Column="1"
+                                        Text="{Binding Title}"
+                                        VerticalAlignment="Center"
+                                        FontSize="16"
+                                        Margin="10,0,0,0"
+                                        TextWrapping="Wrap"
+                                        MaxHeight="40"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <!--<ScrollViewer Grid.Row="1"
                         VerticalScrollBarVisibility="Auto"
                         Background="#2e2e2e">
                         <StackPanel x:Name="PnlGameList" Margin="10"/>
-                    </ScrollViewer>
+                    </ScrollViewer>-->
                 </Grid>
             </Grid>
         </Grid>
