@@ -42,13 +42,156 @@
                         Click="BtnPlayButton_Click" 
                         Visibility="Collapsed"
                         HorizontalAlignment="Left"
-                        IsDefault="True"/>  
+                        IsDefault="True"/>
                 </StackPanel>
 
-                <!-- Lado direito: Lista de jogos -->
-                <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Background="#2e2e2e">
-                    <StackPanel x:Name="PnlGameList" Margin="10"/>
-                </ScrollViewer>
+                <!-- Lado direito: Lista de jogos com painel fixo no topo -->
+                <Grid Grid.Column="1" Background="#2e2e2e">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <!-- Painel fixo -->
+                        <RowDefinition Height="*"/>
+                        <!-- Conteúdo rolável -->
+                    </Grid.RowDefinitions>
+
+                    <Border x:Name="PnlActions"
+                        Grid.Row="0"
+                        MinHeight="40"
+                        Background="#3a3a3a"
+                        HorizontalAlignment="Stretch"                       
+                        ClipToBounds="True">
+                        <Grid>
+                            <!-- Topo fixo com botão -->
+                            <DockPanel LastChildFill="False" Margin="5" VerticalAlignment="Top">
+                                <TextBlock Text="Menu"
+                                    Foreground="White"
+                                    FontSize="16"
+                                    VerticalAlignment="Center"
+                                    DockPanel.Dock="Left"/>
+
+                                <Button Grid.Column="2" Content="☰" x:Name="BtnTogglePanel"
+                                    Width="40"
+                                    Cursor="Hand"
+                                    ToolTip="Clique para expandir"
+                                    Click="TogglePanel_Click"
+                                    FontSize="16"
+                                    Foreground="White"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    DockPanel.Dock="Right">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="border"
+                                                Background="{TemplateBinding Background}">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                     VerticalAlignment="Center" />
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#33FFFFFF" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </DockPanel>
+
+                            <!-- Conteúdo ocultável -->
+                            <StackPanel x:Name="ExpandableContent"
+                                Margin="10,20,10,10"
+                                VerticalAlignment="Top">
+                                <Grid Grid.Row="0" Margin="10,10,10,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Right">
+                                        <Button x:Name="BtnAddGame"
+                                        Content="➕"
+                                        ToolTip="Adicionar Jogo"
+                                        Width="40"
+                                        Height="30"
+                                        Click="BtnAddGame_Click"
+                                        Foreground="White"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        HorizontalAlignment="Left"
+                                        IsDefault="True">
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border x:Name="border"
+                                                    Background="{TemplateBinding Background}">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="border" Property="Background" Value="#33FFFFFF" />
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Button.Template>
+                                        </Button>
+                                        <Button x:Name="BtnSettings"
+                                        Content="⚙️"
+                                        ToolTip="Configurações"
+                                        Width="40"
+                                        Height="30"
+                                        Foreground="White"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        Click="BtnSettings_Click"
+                                        HorizontalAlignment="Left">
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border x:Name="border"
+                                                    Background="{TemplateBinding Background}">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="border" Property="Background" Value="#33FFFFFF" />
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Button.Template>
+                                        </Button>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" HorizontalAlignment="Stretch">
+                                        <Label Target="{Binding ElementName=SearchTextBox}"
+                                            Foreground="White"
+                                            FontSize="14"
+                                            FontWeight="SemiBold">
+                                            <Label.Content>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Viewbox Width="16" Height="16" Margin="0,0,5,0">
+                                                        <Path Data="M 13 3 C 7.4889971 3 3 7.4889971 3 13 C 3 18.511003 7.4889971 23 13 23 C 15.396508 23 17.597385 22.148986 19.322266 20.736328 L 25.292969 26.707031 A 1.0001 1.0001 0 1 0 26.707031 25.292969 L 20.736328 19.322266 C 22.148986 17.597385 23 15.396508 23 13 C 23 7.4889971 18.511003 3 13 3 z M 13 5 C 17.430123 5 21 8.5698774 21 13 C 21 17.430123 17.430123 21 13 21 C 8.5698774 21 5 17.430123 5 13 C 5 8.5698774 8.5698774 5 13 5 z"
+                                                            Fill="White" />
+                                                        <!--Icone temporario-->
+                                                    </Viewbox>
+                                                    <TextBlock Text="Pesquisar:" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Label.Content>
+                                        </Label>
+                                        <TextBox x:Name="SearchTextBox"
+                                            Padding="5"
+                                            FontSize="14"
+                                            TextChanged="SearchTextBox_TextChanged"
+                                            ToolTip="Digite para pesquisar..."/>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+
+                    <!-- Conteúdo rolável -->
+                    <ScrollViewer Grid.Row="1"
+                        VerticalScrollBarVisibility="Auto"
+                        Background="#2e2e2e">
+                        <StackPanel x:Name="PnlGameList" Margin="10"/>
+                    </ScrollViewer>
+                </Grid>
             </Grid>
         </Grid>
     </Border>

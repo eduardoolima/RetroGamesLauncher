@@ -45,27 +45,27 @@
         </Button>
 
             <Button Grid.Column="2" Content="🗖"
-            Width="40"
-            Click="MaximizeRestore_Click"
-            FontSize="16"
-            Foreground="White"
-            Background="Transparent"
-            BorderBrush="Transparent">
-            <Button.Template>
-                <ControlTemplate TargetType="Button">
-                    <Border x:Name="border"
-                    Background="{TemplateBinding Background}">
-                        <ContentPresenter HorizontalAlignment="Center"
-                                  VerticalAlignment="Center" />
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="#33FFFFFF" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Button.Template>
-        </Button>
+                Width="40"
+                Click="MaximizeRestore_Click"
+                FontSize="16"
+                Foreground="White"
+                Background="Transparent"
+                BorderBrush="Transparent">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                        Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#33FFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
 
             <Button Grid.Column="3" Content="✖"
             Width="40"
