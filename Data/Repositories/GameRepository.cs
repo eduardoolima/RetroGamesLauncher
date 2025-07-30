@@ -64,7 +64,20 @@ public class GameRepository : IGameRepository
         {
             throw new Exception("Error retrieving game by title from the repository", ex);
         }
-    } 
+    }
+    public async Task<List<GameInfo>> GetByTitleLike(string title)
+    {
+        try
+        {
+            return await _context.Games
+                .Where(g => EF.Functions.Like(g.Title, $"%{title}%"))
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error retrieving games by similar title from the repository", ex);
+        }
+    }
 
     public int GetTotalCount()
     {
@@ -124,5 +137,4 @@ public class GameRepository : IGameRepository
             throw new Exception("Error updating game in the repository", ex);
         }
     }
-   
 }

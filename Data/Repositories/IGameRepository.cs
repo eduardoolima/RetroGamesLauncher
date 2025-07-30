@@ -7,6 +7,7 @@ public interface IGameRepository
     Task<List<GameInfo>> GetByPaging(int pageIndex, int pageSize);
     GameInfo GetById(int id);
     GameInfo GetByTitle(string title);
+    Task<List<GameInfo>> GetByTitleLike(string title);
     int GetTotalCount();
     void Add(GameInfo game);
     void Update(GameInfo game);

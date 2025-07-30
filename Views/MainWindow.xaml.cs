@@ -16,7 +16,7 @@ namespace RetroGamesLauncher.Views;
 /// Interaction logic for MainWindow.xaml
 /// </summary>
 public partial class MainWindow : Window
-{
+{   
     #region Fields
 
     private GameInfo selectedGame = null; // Armazena o jogo atual
@@ -180,33 +180,68 @@ public partial class MainWindow : Window
         _searchCancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = _searchCancellationTokenSource.Token;
 
-        // Pega o texto atual da caixa de busca
-        string searchText = SearchTextBox.Text;
         try
         {
             // Implementa o debounce
-            // Espera por 300 milissegundos antes de disparar a busca
             await Task.Delay(300, cancellationToken);
 
-            // Se a busca foi cancelada durante o delay (usuário digitou novamente), retorna
             if (cancellationToken.IsCancellationRequested)
-            {
                 return;
-            }
 
-            // Agora, faz a busca no banco de dados
-            //await PerformSearch(searchText, cancellationToken);
+            string searchText = SearchTextBox.Text.Trim();
+
+            _visibleGames.Clear();
+
+            if (string.IsNullOrEmpty(searchText))
+            {
+                // Volta para a exibição normal (paginada)
+                _currentPage = 1;
+                _totalGamesCount = _gameRepository.GetTotalCount();
+                await LoadNextPageAsync();
+            }
+            else
+            {
+                // Busca e exibe todos os resultados correspondentes
+                var results = await _gameRepository.GetByTitleLike(searchText);
+                foreach (var game in results)
+                {
+                    _visibleGames.Add(new GameViewModel
+                    {
+                        Title = game.Title,
+                        ImageSource = new BitmapImage(new Uri(AppDomain.CurrentDomain.BaseDirectory + game.ImagePath)),
+                        Game = game
+                    });
+                }
+            }
         }
         catch (TaskCanceledException)
         {
-            // Isso é esperado quando uma busca é cancelada, então não precisa fazer nada.
-            // Significa que o usuário digitou mais rápido do que o delay.
+            // Busca cancelada, não faz nada
         }
         catch (Exception ex)
         {
-            // Tratar outros erros que possam ocorrer durante a busca
             MessageBox.Show($"Ocorreu um erro na busca: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
         }
+    }
+
+    // Nova versão assíncrona para uso interno na busca
+    private async Task LoadNextPageAsync()
+    {
+        if ((_currentPage - 1) * _pageSize >= _totalGamesCount)
+            return;
+
+        var page = await _gameRepository.GetByPaging(_currentPage, _pageSize);
+        foreach (var game in page)
+        {
+            _visibleGames.Add(new GameViewModel
+            {
+                Title = game.Title,
+                ImageSource = new BitmapImage(new Uri(AppDomain.CurrentDomain.BaseDirectory + game.ImagePath)),
+                Game = game
+            });
+        }
+
+        _currentPage++;
     }
 
     #endregion
