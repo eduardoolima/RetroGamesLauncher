@@ -21,7 +21,7 @@ namespace RetroGamesLauncher.Views
     /// </summary>
     public partial class AddGame : Window
     {
-        private readonly List<GameGender> _genders;
+        private readonly List<GameGender> _genders; 
         public AddGame()
         {
             InitializeComponent();
