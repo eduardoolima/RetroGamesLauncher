@@ -282,7 +282,9 @@ public partial class MainWindow : Window
 
     private void BtnAddGame_Click(object sender, RoutedEventArgs e)
     {
-
+        var addGameWindow = new AddGame();
+        addGameWindow.Owner = this;
+        addGameWindow.Show();
     }
 
     private void BtnSettings_Click(object sender, RoutedEventArgs e)

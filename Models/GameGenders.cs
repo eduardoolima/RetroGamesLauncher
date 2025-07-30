@@ -8,10 +8,6 @@ public class GameGender
     [Required]
     public string Gender { get; set; }
 
-    public GameGender()
-    {
-    }
-
     public GameGender(string gender)
     {
         Gender = gender;
