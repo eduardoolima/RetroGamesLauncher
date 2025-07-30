@@ -6,6 +6,7 @@ namespace RetroGamesLauncher.Data
     public class AppDbContext : DbContext
     {
         public DbSet<GameInfo> Games { get; set; }
+        public DbSet<GameGender> GameGenders { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {

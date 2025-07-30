@@ -34,6 +34,7 @@
                 <StackPanel Grid.Column="0" Margin="10">
                     <Image x:Name="ImgMainImage" Height="300" Stretch="Uniform" Margin="0 0 0 10"/>
                     <TextBlock x:Name="TxtGameTitle" FontSize="24" Foreground="White" Margin="0 0 0 5"/>
+                    <TextBlock x:Name="TxtGameGender" FontSize="16" Foreground="White" Margin="0 0 0 5"/>
                     <TextBlock x:Name="TxtGameDescription" TextWrapping="Wrap" Foreground="LightGray"/>
                     <Button x:Name="BtnPlayButton" Content="▶ Jogar" 
                         Width="100"

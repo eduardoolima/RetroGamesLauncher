@@ -102,7 +102,7 @@
     <None Update="Assets\Images\GamesCover\Zombies Ate My Neighbors.jpeg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\Images\GamesScreenshot\Disney%27s Aladdin SNES Super Nintendo.jpeg">
+    <None Update="Assets\Images\GamesScreenshot\Aladdin SNES Super Nintendo.jpeg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Images\GamesScreenshot\donkeyKongCountry.jpeg">

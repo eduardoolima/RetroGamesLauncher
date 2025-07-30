@@ -14,7 +14,7 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Text="RetroGamesLauncher"
+        <TextBlock Text="Retro Games Launcher"
                    VerticalAlignment="Center"
                    Foreground="White"
                    Margin="10,0"

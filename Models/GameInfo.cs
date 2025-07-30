@@ -14,6 +14,7 @@ namespace RetroGamesLauncher.Models
         [Required]
         public string RomPath { get; set; }        
         public string ScreenshotPath { get; set; }
+        public GameGender Gender { get; set; }
         [Required]
         public Emulators EmulatorId { get; set; }
     }    

@@ -113,7 +113,7 @@ public partial class MainWindow : Window
     private async void LoadNextPage()
     {
         if ((_currentPage - 1) * _pageSize >= _totalGamesCount)
-            return;
+            return;       
 
         var page = await _gameRepository.GetByPaging(_currentPage, _pageSize);
         foreach (var game in page)
@@ -121,7 +121,7 @@ public partial class MainWindow : Window
             _visibleGames.Add(new GameViewModel
             {
                 Title = game.Title,
-                ImageSource = new BitmapImage(new Uri(AppDomain.CurrentDomain.BaseDirectory + game.ImagePath)),
+                ImageSource = !string.IsNullOrEmpty(game.ImagePath) ? new BitmapImage(new Uri(AppDomain.CurrentDomain.BaseDirectory + game.ImagePath)) : null,
                 Game = game
             });
         }
@@ -165,6 +165,7 @@ public partial class MainWindow : Window
         var imgPath = AppDomain.CurrentDomain.BaseDirectory + game.ScreenshotPath;
         ImgMainImage.Source = new BitmapImage(new Uri(imgPath, UriKind.Absolute));
         TxtGameTitle.Text = game.Title;
+        TxtGameGender.Text = game.Gender.Gender;
         TxtGameDescription.Text = game.Description;
 
         BtnPlayButton.Visibility = Visibility.Visible;

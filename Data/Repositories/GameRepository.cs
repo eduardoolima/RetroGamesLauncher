@@ -16,7 +16,7 @@ public class GameRepository : IGameRepository
     {
         try
         {
-            return _context.Games.ToList();
+            return _context.Games.Include(g => g.Gender).ToList();
         }
         catch (Exception ex)
         {
@@ -30,6 +30,7 @@ public class GameRepository : IGameRepository
         {
             int offset = (pageIndex - 1) * pageSize;
             return await _context.Games
+                .Include(g => g.Gender)
                 .OrderBy(g => g.Title)
                 .Skip(offset)
                 .Take(pageSize)
@@ -57,7 +58,7 @@ public class GameRepository : IGameRepository
     {
         try
         {
-            return _context.Games.FirstOrDefault(g => g.Title.Equals(title, StringComparison.OrdinalIgnoreCase))
+            return _context.Games.Include(g => g.Gender).FirstOrDefault(g => g.Title.Equals(title, StringComparison.OrdinalIgnoreCase))
                    ?? throw new KeyNotFoundException($"Game with title '{title}' not found.");
         }
         catch (Exception ex)
@@ -69,7 +70,7 @@ public class GameRepository : IGameRepository
     {
         try
         {
-            return await _context.Games
+            return await _context.Games.Include(g => g.Gender)
                 .Where(g => EF.Functions.Like(g.Title, $"%{title}%"))
                 .ToListAsync();
         }
