@@ -2,7 +2,7 @@
 using RetroGamesLauncher.Models;
 using System.Windows;
 
-namespace RetroGamesLauncher.Views 
+namespace RetroGamesLauncher.Views
 {
     /// <summary>
     /// Lógica interna para AddGame.xaml
