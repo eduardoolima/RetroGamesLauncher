@@ -1,6 +1,7 @@
 ﻿using RetroGamesLauncher.Data;
 using RetroGamesLauncher.Models;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace RetroGamesLauncher.Views
 {
@@ -59,5 +60,16 @@ namespace RetroGamesLauncher.Views
                 GenderComboBox.Items.Refresh();
             }
         }
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+            if (comboBox != null)
+            {
+                var selectedItem = comboBox.SelectedItem;
+                // Faça o que desejar com selectedItem
+                MessageBox.Show($"Selecionado: {selectedItem}");
+            }
+        }
+
     }
 }

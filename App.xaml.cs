@@ -5,6 +5,8 @@ using RetroGamesLauncher.Data.Repositories;
 using RetroGamesLauncher.Services;
 using RetroGamesLauncher.Views;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace RetroGamesLauncher;
 
@@ -51,5 +53,25 @@ public partial class App : Application
         _host.Dispose();
         base.OnExit(e);
     }
-    
+
+    private void ComboBox_ClickAnywhere(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is ComboBox comboBox)
+        {
+            if (comboBox.IsDropDownOpen)
+            {
+                comboBox.IsDropDownOpen = false;
+                e.Handled = false;
+            }
+            else
+            {
+                comboBox.Focus();
+                comboBox.IsDropDownOpen = true;
+                e.Handled = true;
+            }
+        }
+    }
+
+
+
 }
