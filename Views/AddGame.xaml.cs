@@ -1,7 +1,9 @@
-﻿using RetroGamesLauncher.Data;
+﻿using Microsoft.Win32;
+using RetroGamesLauncher.Data;
 using RetroGamesLauncher.Models;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace RetroGamesLauncher.Views
 {
@@ -31,8 +33,8 @@ namespace RetroGamesLauncher.Views
                 Title = TitleTextBox.Text,
                 Description = DescriptionTextBox.Text,
                 RomPath = RomPathTextBox.Text,
-                ImagePath = ImagePathTextBox.Text,
-                ScreenshotPath = ScreenshotPathTextBox.Text,
+                //ImagePath = ImagePathTextBox.Text,
+                //ScreenshotPath = ScreenshotPathTextBox.Text,
                 Gender = GenderComboBox.SelectedItem as GameGender,
                 // EmulatorId: defina como quiser
             };
@@ -66,10 +68,70 @@ namespace RetroGamesLauncher.Views
             if (comboBox != null)
             {
                 var selectedItem = comboBox.SelectedItem;
-                // Faça o que desejar com selectedItem
-                MessageBox.Show($"Selecionado: {selectedItem}");
+                //MessageBox.Show($"Selecionado: {selectedItem}");
             }
         }
+        private void BtnAddGameCover_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
 
+            // Filtra para exibir apenas arquivos de imagem
+            openFileDialog.Filter = "Arquivos de Imagem|*.jpg;*.jpeg;*.png;*.gif|Todos os Arquivos|*.*";
+
+            // Executa o diálogo e verifica se o usuário selecionou um arquivo
+            if (openFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    // Cria um novo BitmapImage
+                    BitmapImage bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+
+                    // Define a Uri da imagem a partir do caminho do arquivo
+                    bitmap.UriSource = new Uri(openFileDialog.FileName);
+
+                    // Finaliza a inicialização da imagem
+                    bitmap.EndInit();
+
+                    // Atribui a imagem ao controle Image no XAML
+                    ImgGameCoverViewer.Source = bitmap;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro ao carregar a imagem: " + ex.Message);
+                }
+            }
+        }        
+        private void BtnAddGameScreenshot_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Arquivos de Imagem|*.jpg;*.jpeg;*.png;*.gif|Todos os Arquivos|*.*";
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    ImgGameScreenshotViewer.Source = new BitmapImage(new Uri(openFileDialog.FileName));
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro ao carregar o screenshot: " + ex.Message);
+                }
+            }
+        }
+        private void BtnAddRom_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+
+            // Exemplo: Filtro para arquivos de texto. Você pode ajustar conforme sua necessidade.
+            openFileDialog.Filter = "Todos os Arquivos|*.*";
+
+            // Abre o diálogo e verifica se o usuário selecionou um arquivo
+            if (openFileDialog.ShowDialog() == true)
+            {
+                // Atribui o caminho completo do arquivo à TextBox
+                RomPathTextBox.Text = openFileDialog.FileName;
+            }
+        }
     }
 }

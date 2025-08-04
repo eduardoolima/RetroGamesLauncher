@@ -52,19 +52,70 @@
 
                         <!-- Caminho da ROM -->
                         <TextBlock Text="Caminho da ROM" Margin="0,10,0,0" Foreground="White"/>
-                        <TextBox x:Name="RomPathTextBox" Padding="5" FontSize="14"
-                                 Background="#252526" Foreground="White" BorderBrush="#3c3c3c"/>
+                        <Grid Margin="0,5,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
 
-                         <!--Imagem-->
-                        <TextBlock Text="Capa (Imagem)" Margin="0,10,0,0" Foreground="White"/>
-                        <TextBox x:Name="ImagePathTextBox" Padding="5" FontSize="14"
-                                 Background="#252526" Foreground="White" BorderBrush="#3c3c3c"/>
+                            <Button Grid.Column="0" Content="📁" Width="30" Height="30" Margin="0,0,5,0"
+                                Click="BtnAddRom_Click"
+                                ToolTip="Adicionar Rom"
+                                Background="#252526"
+                                Foreground="White"
+                                BorderBrush="#3c3c3c">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="border" Background="{TemplateBinding Background}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#33FFFFFF" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                            <TextBox x:Name="RomPathTextBox" Grid.Column="1" Padding="5" FontSize="14" AcceptsReturn="True"
+                                Background="#252526" Foreground="White" BorderBrush="#3c3c3c"/>
+                        </Grid>
 
-                         <!--Screenshot-->
-                        <TextBlock Text="Screenshot" Margin="0,10,0,0" Foreground="White"/>
-                        <TextBox x:Name="ScreenshotPathTextBox" Padding="5" FontSize="14"
-                                 Background="#252526" Foreground="White" BorderBrush="#3c3c3c"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!--Imagem-->
+                            <StackPanel Grid.Column="0">
 
+                                <TextBlock Text="Capa do Jogo (Imagem)" Margin="10,10,10,0" Foreground="White" HorizontalAlignment="Center"/>
+                                <Button Content="Selecionar Capa" 
+                                    Click="BtnAddGameCover_Click"
+                                    Margin="10"
+                                    Height="25">
+                                </Button>
+                                <Image x:Name="ImgGameCoverViewer" 
+                                    Margin="10"
+                                    HorizontalAlignment="Center"
+                                    Stretch="UniformToFill"/>
+                            </StackPanel>
+
+                            <!--Screenshot-->
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Screenshot do Jogo (Imagem)" Margin="10,10,10,0" Foreground="White" HorizontalAlignment="Center"/>
+                                <Button Content="Selecionar Screenshot"
+                                    Click="BtnAddGameScreenshot_Click"
+                                    Margin="10"
+                                    Height="25"/>
+                                <Image x:Name="ImgGameScreenshotViewer"
+                                    Margin="10"
+                                    HorizontalAlignment="Center"
+                                    Stretch="UniformToFill"/>
+                            </StackPanel>
+                        </Grid>
+                                                
                         <!-- Gênero + Botão de adicionar -->
                         <TextBlock Text="Gênero" Margin="0,10,0,0" Foreground="White"/>
                         <Grid Margin="0,5,0,0">
@@ -104,41 +155,12 @@
                                 </Button.Template>
                             </Button>
                         </Grid>
-
-                        <!--<StackPanel Orientation="Horizontal">
-                            <ComboBox x:Name="GenderComboBox"
-                                      Width="300"
-                                      DisplayMemberPath="Gender"
-                                      HorizontalAlignment="Stretch"
-                                      SelectedValuePath="Id"/>
-
-                            <Button Content="➕" Width="30" Height="30" Margin="5,0,0,0"
-                                    Click="AddGender_Click"
-                                    ToolTip="Adicionar novo gênero"
-                                    Background="#252526"
-                                    Foreground="White"
-                                    BorderBrush="#3c3c3c">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border x:Name="border"
-                                            Background="{TemplateBinding Background}">
-                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="border" Property="Background" Value="#33FFFFFF" />
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-                        </StackPanel>-->
                     </StackPanel>
 
                     <!-- Botões -->
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,10">
-                        <Button Content="Salvar" Width="100" Margin="0,0,10,0" Click="SaveButton_Click"/>
-                        <Button Content="Cancelar" Width="100" Click="CancelButton_Click"/>
+                        <Button Content="Salvar ✔️" Height="30" Width="100" Margin="0,0,10,0" Click="SaveButton_Click"/>
+                        <Button Content="Cancelar" Height="30" Width="100" Click="CancelButton_Click"/>
                     </StackPanel>
                 </Grid>
             </ScrollViewer>
