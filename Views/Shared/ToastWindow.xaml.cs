@@ -1,8 +1,10 @@
-﻿using RetroGamesLauncher.Services;
+﻿using RetroGamesLauncher.Models.AuxModels;
+using RetroGamesLauncher.Services;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
@@ -14,10 +16,19 @@ namespace RetroGamesLauncher.Views
     public partial class ToastWindow : Window
     {
         private DispatcherTimer _timer;
-        public ToastWindow(string message, int durationSeconds = 3)
+
+        /// <summary>
+        /// Cria e exibe uma janela de toast (notificação pop-up) na tela.
+        /// </summary>
+        /// <param name="message">A mensagem de texto a ser exibida na notificação.</param>
+        /// <param name="typeToastMessage">O tipo da notificação, que define a cor de fundo (padrão, sucesso, erro, etc.).</param>
+        /// <param name="durationSeconds">A duração em segundos que a notificação permanecerá visível antes de fechar automaticamente.</param>
+        public ToastWindow(string message, TypeToastMessage typeToastMessage = TypeToastMessage.Default, int durationSeconds = 3)
         {
             InitializeComponent();
             MessageText.Text = message;
+            MessageText.Foreground = ColorManager.GetTextColorBrush(typeToastMessage);
+            ToasMessage.Background = ColorManager.GetColorBrush(typeToastMessage);
 
             _timer = new DispatcherTimer
             {

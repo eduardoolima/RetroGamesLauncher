@@ -1,12 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RetroGamesLauncher.Data;
 using RetroGamesLauncher.Data.Repositories;
 using RetroGamesLauncher.Services;
 using RetroGamesLauncher.Views;
+using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace RetroGamesLauncher;
 
@@ -15,8 +15,9 @@ namespace RetroGamesLauncher;
 /// </summary>
 public partial class App : Application
 {
-    private IHost _host;
-
+    private IHost _host;    
+    public static IConfiguration Configuration { get; private set; }
+    public static IServiceProvider Services => ((App)Current)._host.Services;
     public App()
     {
         _host = Host.CreateDefaultBuilder()
@@ -24,10 +25,13 @@ public partial class App : Application
             {
                 services.AddDbContext<AppDbContext>();
                 services.AddScoped<IGameRepository, GameRepository>();
+                services.AddScoped<IGameGenderRepository, GameGenderRepository>();
                 services.AddScoped<MainWindow>();
+                services.AddScoped<AddGame>();
             })
             .Build();
-    }
+    }    
+
     protected override async void OnStartup(StartupEventArgs e)
     {
         await _host.StartAsync();
@@ -44,6 +48,12 @@ public partial class App : Application
         var mainWindow = _host.Services.GetRequiredService<MainWindow>();
         mainWindow.Show();
 
+        var builder = new ConfigurationBuilder()
+            .SetBasePath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config"))
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+        Configuration = builder.Build();
+
         base.OnStartup(e);
     }
 
@@ -53,25 +63,4 @@ public partial class App : Application
         _host.Dispose();
         base.OnExit(e);
     }
-
-    private void ComboBox_ClickAnywhere(object sender, MouseButtonEventArgs e)
-    {
-        if (sender is ComboBox comboBox)
-        {
-            if (comboBox.IsDropDownOpen)
-            {
-                comboBox.IsDropDownOpen = false;
-                e.Handled = false;
-            }
-            else
-            {
-                comboBox.Focus();
-                comboBox.IsDropDownOpen = true;
-                e.Handled = true;
-            }
-        }
-    }
-
-
-
 }

@@ -1,4 +1,5 @@
-﻿using RetroGamesLauncher.Data.Repositories;
+﻿using Microsoft.Extensions.DependencyInjection;
+using RetroGamesLauncher.Data.Repositories;
 using RetroGamesLauncher.Models;
 using RetroGamesLauncher.Models.ViewModels;
 using RetroGamesLauncher.Services;
@@ -282,7 +283,7 @@ public partial class MainWindow : Window
 
     private void BtnAddGame_Click(object sender, RoutedEventArgs e)
     {
-        var addGameWindow = new AddGame();
+        var addGameWindow = App.Services.GetRequiredService<AddGame>();
         addGameWindow.Owner = this;
         addGameWindow.Show();
     }

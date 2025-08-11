@@ -1,6 +1,12 @@
 ﻿using Microsoft.Win32;
 using RetroGamesLauncher.Data;
+using RetroGamesLauncher.Data.Repositories;
 using RetroGamesLauncher.Models;
+using RetroGamesLauncher.Models.AuxModels;
+using RetroGamesLauncher.Models.Enums;
+using RetroGamesLauncher.Services;
+using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -12,37 +18,61 @@ namespace RetroGamesLauncher.Views
     /// </summary>
     public partial class AddGame : Window
     {
-        private readonly List<GameGender> _genders; 
-        public AddGame()
+        private readonly IGameRepository _gameRepository;
+        private readonly IGameGenderRepository _gameGenderRepository;
+        private readonly List<GameGender> _genders;
+
+        // Variáveis de nível de classe para armazenar os caminhos das imagens
+        private string _gameCoverPath;
+        private string _gameCoverPathOriginal;
+        private string _gameScreenshotPath;
+        private string _gameScreenshotPathOriginal;
+        public AddGame(IGameRepository gameRepository, IGameGenderRepository gameGenderRepository)
         {
             InitializeComponent();
-            _genders = LoadGenders(); // Carrega os gêneros do banco/dados
+            _gameRepository = gameRepository;
+            _gameGenderRepository = gameGenderRepository;
+            _genders = _gameGenderRepository.GetAll().OrderBy(g => g.Gender).ToList();
             GenderComboBox.ItemsSource = _genders;
+
+            LoadEmulatorCombobox();
         }
 
-        private List<GameGender> LoadGenders()
+        void LoadEmulatorCombobox()
         {
-            using var db = new AppDbContext(); // Substitua pelo seu contexto real
-            return db.GameGenders.OrderBy(g => g.Gender).ToList();
+            var enumItems = Enum.GetNames(typeof(Emulators))
+                .Where(name => name != "WithoutEmulator")
+                .Select(name => new EnumItem
+                {
+                    Name = name,
+                    Value = (int)Enum.Parse(typeof(Emulators), name)
+                }).ToList();
+            EmulatorComboBox.ItemsSource = enumItems;
+            if (enumItems.Count < 2)
+            {
+                EmulatorComboBox.SelectedIndex = 0;
+            }
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
-        {
-            var newGame = new GameInfo
-            {
-                Title = TitleTextBox.Text,
-                Description = DescriptionTextBox.Text,
-                RomPath = RomPathTextBox.Text,
-                //ImagePath = ImagePathTextBox.Text,
-                //ScreenshotPath = ScreenshotPathTextBox.Text,
-                Gender = GenderComboBox.SelectedItem as GameGender,
-                // EmulatorId: defina como quiser
-            };
+        {            
+            if (GameInfoValidation.FormValidate(this))
+            {                
+                var selectedEmulatorItem = EmulatorComboBox.SelectedItem as EnumItem;                
 
-            using var db = new AppDbContext();
-            db.Games.Add(newGame);
-            db.SaveChanges();
-            MessageBox.Show("Jogo salvo com sucesso!");
+                var newGame = new GameInfo
+                {
+                    Title = TitleTextBox.Text,
+                    Description = DescriptionTextBox.Text,
+                    RomPath = RomPathTextBox.Text,
+                    ImagePath = _gameCoverPath,
+                    ScreenshotPath = _gameScreenshotPath,
+                    Gender = GenderComboBox.SelectedItem as GameGender,
+                    EmulatorId = (Emulators)selectedEmulatorItem?.Value
+                };
+                _gameRepository.Add(newGame);
+                ToastMessages.ShowTemporaryNotification("Jogo salvo com sucesso!", TypeToastMessage.Success);
+            }            
             Close();
         }
 
@@ -62,75 +92,84 @@ namespace RetroGamesLauncher.Views
                 GenderComboBox.Items.Refresh();
             }
         }
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+
+        private async void BtnAddGameCover_Click(object sender, RoutedEventArgs e)
         {
-            var comboBox = sender as ComboBox;
-            if (comboBox != null)
-            {
-                var selectedItem = comboBox.SelectedItem;
-                //MessageBox.Show($"Selecionado: {selectedItem}");
-            }
+            await LoadImageAndSetSource(ImgGameCoverViewer);
         }
-        private void BtnAddGameCover_Click(object sender, RoutedEventArgs e)
+
+        private async void BtnAddGameScreenshot_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
+            await LoadImageAndSetSource(ImgGameScreenshotViewer);
+        }
 
-            // Filtra para exibir apenas arquivos de imagem
-            openFileDialog.Filter = "Arquivos de Imagem|*.jpg;*.jpeg;*.png;*.gif|Todos os Arquivos|*.*";
+        private async Task LoadImageAndSetSource(Image imageViewer)
+        {
+            OpenFileDialog openFileDialog = new();
+            openFileDialog.Filter = "Arquivos de Imagem|*.jpg;*.jpeg;*.png;*.webp;*";
 
-            // Executa o diálogo e verifica se o usuário selecionou um arquivo
             if (openFileDialog.ShowDialog() == true)
             {
+                string originalPath = openFileDialog.FileName;
                 try
                 {
-                    // Cria um novo BitmapImage
-                    BitmapImage bitmap = new BitmapImage();
-                    bitmap.BeginInit();
+                    string extension = Path.GetExtension(originalPath);
+                    string newFileName = Guid.NewGuid().ToString() + extension;
+                    string newPath = App.Configuration["FilePaths:Images"];                    
+                    if (imageViewer == ImgGameCoverViewer)
+                    {
+                        newPath = Path.Combine(newPath, @$"GamesCover\{newFileName}");
+                        _gameCoverPath = newPath;
+                    }
+                    else if (imageViewer == ImgGameScreenshotViewer)
+                    {
+                        newPath = Path.Combine(newPath, @$"GamesScreenshot\{newFileName}");
+                        _gameScreenshotPath = newPath;
+                    }
 
-                    // Define a Uri da imagem a partir do caminho do arquivo
-                    bitmap.UriSource = new Uri(openFileDialog.FileName);
+                    BitmapImage bitmap = await Task.Run(() =>
+                    {
+                        BitmapImage bmp = new();
+                        bmp.BeginInit();
+                        bmp.CacheOption = BitmapCacheOption.OnLoad;
+                        bmp.UriSource = new Uri(originalPath);
+                        bmp.EndInit();
+                        bmp.Freeze();
+                        //File.Copy(originalPath, newPath);
 
-                    // Finaliza a inicialização da imagem
-                    bitmap.EndInit();
-
-                    // Atribui a imagem ao controle Image no XAML
-                    ImgGameCoverViewer.Source = bitmap;
+                        return bmp;
+                    });                    
+                    imageViewer.Source = bitmap;                    
                 }
                 catch (Exception ex)
                 {
+                    if (imageViewer == ImgGameCoverViewer)
+                    {                        
+                        _gameCoverPath = null;
+                        _gameCoverPathOriginal = null;                        
+                    }
+                    else if (imageViewer == ImgGameScreenshotViewer)
+                    {                        
+                        _gameScreenshotPath = null;
+                        _gameScreenshotPathOriginal = null;                       
+                    }
+                    imageViewer.Source = null;
                     MessageBox.Show("Erro ao carregar a imagem: " + ex.Message);
                 }
             }
-        }        
-        private void BtnAddGameScreenshot_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Arquivos de Imagem|*.jpg;*.jpeg;*.png;*.gif|Todos os Arquivos|*.*";
-
-            if (openFileDialog.ShowDialog() == true)
-            {
-                try
-                {
-                    ImgGameScreenshotViewer.Source = new BitmapImage(new Uri(openFileDialog.FileName));
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Erro ao carregar o screenshot: " + ex.Message);
-                }
-            }
         }
+
         private void BtnAddRom_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
 
-            // Exemplo: Filtro para arquivos de texto. Você pode ajustar conforme sua necessidade.
-            openFileDialog.Filter = "Todos os Arquivos|*.*";
+            openFileDialog.Filter = "Arquivos de ROM|*.smc;*.sfc;*.gen;*.md;*.gba;*.nes|Todos os Arquivos|*.*";
 
             // Abre o diálogo e verifica se o usuário selecionou um arquivo
             if (openFileDialog.ShowDialog() == true)
             {
                 // Atribui o caminho completo do arquivo à TextBox
-                RomPathTextBox.Text = openFileDialog.FileName;
+                RomPathTextBox.Text = openFileDialog.FileName;               
             }
         }
     }

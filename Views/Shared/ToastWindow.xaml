@@ -14,7 +14,8 @@
         ResizeMode="NoResize"
         Loaded="Window_Loaded">
 
-    <Border Background="#DD333333" 
+    <Border x:Name="ToasMessage"
+            Background="#DD333333" 
             CornerRadius="8" 
             Padding="15"
             Opacity="0" 
