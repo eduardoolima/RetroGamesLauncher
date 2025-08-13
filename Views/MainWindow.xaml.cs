@@ -210,7 +210,7 @@ public partial class MainWindow : Window
                     _visibleGames.Add(new GameViewModel
                     {
                         Title = game.Title,
-                        ImageSource = new BitmapImage(new Uri(AppDomain.CurrentDomain.BaseDirectory + game.ImagePath)),
+                        ImageSource = !string.IsNullOrEmpty(game.ImagePath) ? new BitmapImage(new Uri(game.ImagePath, UriKind.RelativeOrAbsolute)) : null,
                         Game = game
                     });
                 }
@@ -238,7 +238,7 @@ public partial class MainWindow : Window
             _visibleGames.Add(new GameViewModel
             {
                 Title = game.Title,
-                ImageSource = new BitmapImage(new Uri(AppDomain.CurrentDomain.BaseDirectory + game.ImagePath)),
+                ImageSource = !string.IsNullOrEmpty(game.ImagePath) ? new BitmapImage(new Uri(game.ImagePath, UriKind.RelativeOrAbsolute)) : null,                
                 Game = game
             });
         }
@@ -291,6 +291,12 @@ public partial class MainWindow : Window
 
     private void BtnSettings_Click(object sender, RoutedEventArgs e)
     {
+        Settings settings = new Settings
+        {
+            Owner = this,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
+        };
+        settings.Show();
 
     }
 

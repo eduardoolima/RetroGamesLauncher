@@ -170,7 +170,7 @@
                                                             Fill="White" />
                                                         <!--Icone temporario-->
                                                     </Viewbox>
-                                                    <TextBlock Text="Pesquisar:" VerticalAlignment="Center" />
+                                                    <TextBlock Text=" Pesquisar:" VerticalAlignment="Center" />
                                                 </StackPanel>
                                             </Label.Content>
                                         </Label>
