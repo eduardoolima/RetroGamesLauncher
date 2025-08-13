@@ -28,7 +28,7 @@ public class GameInfoValidation
                 addEditGame.RomPathTextBox.Focus();
                 isValid = false;
             }
-            if (addEditGame.EmulatorComboBox.SelectedIndex <= 0)
+            if (addEditGame.EmulatorComboBox.SelectedIndex < 0)
             {
                 addEditGame.TxtEmulatorFeedBack.Text = "Selecione um Emulador ⚠️";
                 addEditGame.TxtEmulatorFeedBack.Visibility = Visibility.Visible;

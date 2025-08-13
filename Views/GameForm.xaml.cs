@@ -65,24 +65,52 @@ namespace RetroGamesLauncher.Views
         #region Eventos de Interface
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (GameInfoValidation.FormValidate(this))
+            try
             {
-                var selectedEmulatorItem = EmulatorComboBox.SelectedItem as EnumItem;
-
-                var newGame = new GameInfo
+                if (GameInfoValidation.FormValidate(this))
                 {
-                    Title = TitleTextBox.Text,
-                    Description = DescriptionTextBox.Text,
-                    RomPath = RomPathTextBox.Text,
-                    ImagePath = _gameCoverPath,
-                    ScreenshotPath = _gameScreenshotPath,
-                    Gender = GenderComboBox.SelectedItem as GameGender,
-                    EmulatorId = (Emulators)selectedEmulatorItem?.Value
-                };
-                _gameRepository.Add(newGame);
-                ToastMessages.ShowTemporaryNotification("✔️ Jogo salvo com sucesso!", TypeToastMessage.Success);
+                    var selectedEmulatorItem = EmulatorComboBox.SelectedItem as EnumItem;
+
+                    #region Cópias de arquivos
+                    #region Rom
+                    string extension = Path.GetExtension(RomPathTextBox.Text);
+                    string newRomFileName = Guid.NewGuid().ToString() + extension;
+                    string newRomPath = App.Configuration["FilePaths:Roms"];
+                    newRomPath = Path.Combine(newRomPath, newRomFileName);
+                    File.Copy(RomPathTextBox.Text, newRomPath);
+                    #endregion
+                    #region Imagens
+
+                    if (_gameCoverPathOriginal != null && _gameCoverPath != null)
+                    {
+                        File.Copy(_gameCoverPathOriginal, _gameCoverPath, true);
+                    }
+                    if (_gameScreenshotPathOriginal != null && _gameScreenshotPath != null)
+                    {
+                        File.Copy(_gameScreenshotPathOriginal, _gameScreenshotPath, true);
+                    }  
+                    #endregion
+                    #endregion
+
+                    var newGame = new GameInfo
+                    {
+                        Title = TitleTextBox.Text,
+                        Description = DescriptionTextBox.Text,
+                        RomPath = newRomPath,
+                        ImagePath = _gameCoverPath,
+                        ScreenshotPath = _gameScreenshotPath,
+                        Gender = GenderComboBox.SelectedItem as GameGender,
+                        EmulatorId = (Emulators)selectedEmulatorItem?.Value
+                    };                                        
+                    _gameRepository.Add(newGame);
+                    ToastMessages.ShowTemporaryNotification("✔️ Jogo salvo com sucesso!", TypeToastMessage.Success);
+                    Close();
+                }
             }
-            Close();
+            catch (Exception)
+            {
+                ToastMessages.ShowTemporaryNotification("☠ Deu Ruim!", TypeToastMessage.Error);
+            }
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e) => Close();
@@ -136,11 +164,13 @@ namespace RetroGamesLauncher.Views
                     {
                         newPath = Path.Combine(newPath, @$"GamesCover\{newFileName}");
                         _gameCoverPath = newPath;
+                        _gameCoverPathOriginal = originalPath;
                     }
                     else if (imageViewer == ImgGameScreenshotViewer)
                     {
                         newPath = Path.Combine(newPath, @$"GamesScreenshot\{newFileName}");
                         _gameScreenshotPath = newPath;
+                        _gameScreenshotPathOriginal = originalPath;
                     }
 
                     BitmapImage bitmap = await Task.Run(() =>
@@ -161,7 +191,7 @@ namespace RetroGamesLauncher.Views
                 {
                     if (imageViewer == ImgGameCoverViewer)
                     {
-                        _gameCoverPath = null;
+                        _gameCoverPath = null;                        
                         _gameCoverPathOriginal = null;
                     }
                     else if (imageViewer == ImgGameScreenshotViewer)

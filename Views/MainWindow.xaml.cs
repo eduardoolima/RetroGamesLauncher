@@ -122,7 +122,7 @@ public partial class MainWindow : Window
             _visibleGames.Add(new GameViewModel
             {
                 Title = game.Title,
-                ImageSource = !string.IsNullOrEmpty(game.ImagePath) ? new BitmapImage(new Uri(AppDomain.CurrentDomain.BaseDirectory + game.ImagePath)) : null,
+                ImageSource = !string.IsNullOrEmpty(game.ImagePath) ? new BitmapImage(new Uri(game.ImagePath, UriKind.RelativeOrAbsolute)) : null,                
                 Game = game
             });
         }
@@ -163,8 +163,7 @@ public partial class MainWindow : Window
     {
         selectedGame = game;
 
-        var imgPath = AppDomain.CurrentDomain.BaseDirectory + game.ScreenshotPath;
-        ImgMainImage.Source = new BitmapImage(new Uri(imgPath, UriKind.Absolute));
+        ImgMainImage.Source = new BitmapImage(new Uri(game.ScreenshotPath, UriKind.Absolute));
         TxtGameTitle.Text = game.Title;
         TxtGameGender.Text = game.Gender.Gender;
         TxtGameDescription.Text = game.Description;

@@ -39,7 +39,7 @@ public static class EmulatorManager
 
         try
         {
-            string romFullPath = Path.Combine(AppContext.BaseDirectory, romPath);
+            //string romFullPath = Path.Combine(AppContext.BaseDirectory, romPath);
 
             // Fecha o processo anterior antes de iniciar um novo
             CloseEmulator();
@@ -47,7 +47,7 @@ public static class EmulatorManager
             ProcessStartInfo startInfo = new()
             {
                 FileName = emulatorExePath,
-                Arguments = $"\"{romFullPath}\" {(string.IsNullOrWhiteSpace(arguments) ? "" : arguments)}",
+                Arguments = $"\"{romPath}\" {(string.IsNullOrWhiteSpace(arguments) ? "" : arguments)}",
                 WorkingDirectory = emulatorDirPath,
                 UseShellExecute = true
             };
