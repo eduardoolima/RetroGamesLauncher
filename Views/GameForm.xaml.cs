@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
-using RetroGamesLauncher.Data;
 using RetroGamesLauncher.Data.Repositories;
 using RetroGamesLauncher.Models;
 using RetroGamesLauncher.Models.AuxModels;
@@ -8,7 +7,6 @@ using RetroGamesLauncher.Models.Enums;
 using RetroGamesLauncher.Services;
 using RetroGamesLauncher.Views.Shared;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -23,6 +21,8 @@ namespace RetroGamesLauncher.Views
         private readonly IGameRepository _gameRepository;
         private readonly IGameGenderRepository _gameGenderRepository;
         private List<GameGender> _genders;
+
+        public event EventHandler<EventArgs> NewGame;
 
         // Variáveis de nível de classe para armazenar os caminhos das imagens
         private string _gameCoverPath;
@@ -39,7 +39,7 @@ namespace RetroGamesLauncher.Views
             LoadEmulatorCombobox();
         }
 
-        #region Métodos de Inicialização
+        #region Initialization Methods
         void LoadEmulatorCombobox()
         {
             var enumItems = Enum.GetNames(typeof(Emulators))
@@ -62,7 +62,7 @@ namespace RetroGamesLauncher.Views
         }
         #endregion
 
-        #region Eventos de Interface
+        #region Interface Events
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -103,6 +103,7 @@ namespace RetroGamesLauncher.Views
                         EmulatorId = (Emulators)selectedEmulatorItem?.Value
                     };                                        
                     _gameRepository.Add(newGame);
+                    NewGame?.Invoke(this, EventArgs.Empty);
                     ToastMessages.ShowTemporaryNotification("✔️ Jogo salvo com sucesso!", TypeToastMessage.Success);
                     Close();
                 }
@@ -143,10 +144,10 @@ namespace RetroGamesLauncher.Views
             {
                 RomPathTextBox.Text = openFileDialog.FileName;
             }
-        } 
+        }
         #endregion
 
-        #region Manipulação de Imagens
+        #region Image Manipulation
         private async Task LoadImageAndSetSource(Image imageViewer)
         {
             OpenFileDialog openFileDialog = new();
@@ -203,10 +204,10 @@ namespace RetroGamesLauncher.Views
                     MessageBox.Show("Erro ao carregar a imagem: " + ex.Message);
                 }
             }
-        }         
+        }
         #endregion
 
-        #region Métodos Auxiliares
+        #region AuxMethods
         private void OnGenderAdded(object sender, EventArgs e)
         {
             LoadGenders();

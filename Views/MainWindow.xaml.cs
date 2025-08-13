@@ -81,8 +81,9 @@ public partial class MainWindow : Window
     /// <summary>
     /// Carrega a lista de jogos do repositório e exibe na interface.
     /// </summary>
-    private void LoadGameList()
+    private void LoadGameList(bool fromOnNewGame = false)
     {
+        _currentPage = fromOnNewGame ? 1 : _currentPage;
         _totalGamesCount = _gameRepository.GetTotalCount();
         LoadNextPage();
         
@@ -112,7 +113,7 @@ public partial class MainWindow : Window
     }
 
     private async void LoadNextPage()
-    {
+    {       
         if ((_currentPage - 1) * _pageSize >= _totalGamesCount)
             return;       
 
@@ -163,7 +164,7 @@ public partial class MainWindow : Window
     {
         selectedGame = game;
 
-        ImgMainImage.Source = new BitmapImage(new Uri(game.ScreenshotPath, UriKind.Absolute));
+        ImgMainImage.Source = !string.IsNullOrEmpty(game.ScreenshotPath) ? new BitmapImage(new Uri(game.ScreenshotPath, UriKind.Absolute)) : null;
         TxtGameTitle.Text = game.Title;
         TxtGameGender.Text = game.Gender.Gender;
         TxtGameDescription.Text = game.Description;
@@ -284,6 +285,7 @@ public partial class MainWindow : Window
     {
         var addGameWindow = App.Services.GetRequiredService<GameForm>();
         addGameWindow.Owner = this;
+        addGameWindow.NewGame += OnNewGame;
         addGameWindow.Show();
     }
 
@@ -292,5 +294,13 @@ public partial class MainWindow : Window
 
     }
 
+    #endregion
+
+    #region AuxMethods
+    private void OnNewGame(object sender, EventArgs e)
+    {
+        _visibleGames.Clear();
+        LoadGameList(true);
+    }
     #endregion
 }
