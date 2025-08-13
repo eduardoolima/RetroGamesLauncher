@@ -5,6 +5,7 @@ using RetroGamesLauncher.Data;
 using RetroGamesLauncher.Data.Repositories;
 using RetroGamesLauncher.Services;
 using RetroGamesLauncher.Views;
+using RetroGamesLauncher.Views.Shared;
 using System.IO;
 using System.Windows;
 
@@ -26,8 +27,9 @@ public partial class App : Application
                 services.AddDbContext<AppDbContext>();
                 services.AddScoped<IGameRepository, GameRepository>();
                 services.AddScoped<IGameGenderRepository, GameGenderRepository>();
-                services.AddScoped<MainWindow>();
-                services.AddScoped<AddGame>();
+                services.AddTransient<MainWindow>();
+                services.AddTransient<GameForm>();
+                services.AddTransient<GameGenderForm>();
             })
             .Build();
     }    

@@ -11,7 +11,8 @@ public class GameGenderRepository : IGameGenderRepository
     }
     public void Add(GameGender gameGender)
     {
-        throw new NotImplementedException();
+        _context.GameGenders.Add(gameGender);
+        _context.SaveChanges();
     }
 
     public void Delete(int id)

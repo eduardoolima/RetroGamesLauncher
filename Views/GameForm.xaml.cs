@@ -1,10 +1,12 @@
-﻿using Microsoft.Win32;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Win32;
 using RetroGamesLauncher.Data;
 using RetroGamesLauncher.Data.Repositories;
 using RetroGamesLauncher.Models;
 using RetroGamesLauncher.Models.AuxModels;
 using RetroGamesLauncher.Models.Enums;
 using RetroGamesLauncher.Services;
+using RetroGamesLauncher.Views.Shared;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,30 +16,30 @@ using System.Windows.Media.Imaging;
 namespace RetroGamesLauncher.Views
 {
     /// <summary>
-    /// Lógica interna para AddGame.xaml
+    /// Lógica interna para GameForm.xaml
     /// </summary>
-    public partial class AddGame : Window
+    public partial class GameForm : Window
     {
         private readonly IGameRepository _gameRepository;
         private readonly IGameGenderRepository _gameGenderRepository;
-        private readonly List<GameGender> _genders;
+        private List<GameGender> _genders;
 
         // Variáveis de nível de classe para armazenar os caminhos das imagens
         private string _gameCoverPath;
         private string _gameCoverPathOriginal;
         private string _gameScreenshotPath;
         private string _gameScreenshotPathOriginal;
-        public AddGame(IGameRepository gameRepository, IGameGenderRepository gameGenderRepository)
+        public GameForm(IGameRepository gameRepository, IGameGenderRepository gameGenderRepository)
         {
             InitializeComponent();
             _gameRepository = gameRepository;
             _gameGenderRepository = gameGenderRepository;
-            _genders = _gameGenderRepository.GetAll().OrderBy(g => g.Gender).ToList();
-            GenderComboBox.ItemsSource = _genders;
 
+            LoadGenders();
             LoadEmulatorCombobox();
         }
 
+        #region Métodos de Inicialização
         void LoadEmulatorCombobox()
         {
             var enumItems = Enum.GetNames(typeof(Emulators))
@@ -53,12 +55,19 @@ namespace RetroGamesLauncher.Views
                 EmulatorComboBox.SelectedIndex = 0;
             }
         }
+        void LoadGenders()
+        {
+            _genders = _gameGenderRepository.GetAll().OrderBy(g => g.Gender).ToList();
+            GenderComboBox.ItemsSource = _genders;
+        }
+        #endregion
 
+        #region Eventos de Interface
         private void SaveButton_Click(object sender, RoutedEventArgs e)
-        {            
+        {
             if (GameInfoValidation.FormValidate(this))
-            {                
-                var selectedEmulatorItem = EmulatorComboBox.SelectedItem as EnumItem;                
+            {
+                var selectedEmulatorItem = EmulatorComboBox.SelectedItem as EnumItem;
 
                 var newGame = new GameInfo
                 {
@@ -71,8 +80,8 @@ namespace RetroGamesLauncher.Views
                     EmulatorId = (Emulators)selectedEmulatorItem?.Value
                 };
                 _gameRepository.Add(newGame);
-                ToastMessages.ShowTemporaryNotification("Jogo salvo com sucesso!", TypeToastMessage.Success);
-            }            
+                ToastMessages.ShowTemporaryNotification("✔️ Jogo salvo com sucesso!", TypeToastMessage.Success);
+            }
             Close();
         }
 
@@ -80,17 +89,10 @@ namespace RetroGamesLauncher.Views
 
         private void AddGender_Click(object sender, RoutedEventArgs e)
         {
-            var input = Microsoft.VisualBasic.Interaction.InputBox("Digite o novo gênero:", "Novo Gênero", "");
-            if (!string.IsNullOrWhiteSpace(input))
-            {
-                using var db = new AppDbContext();
-                var gender = new GameGender(input);
-                db.GameGenders.Add(gender);
-                db.SaveChanges();
-
-                _genders.Add(gender);
-                GenderComboBox.Items.Refresh();
-            }
+            var gameFormGenderWindow = App.Services.GetRequiredService<GameGenderForm>();
+            gameFormGenderWindow.Owner = this;
+            gameFormGenderWindow.GenderAdded += OnGenderAdded;
+            gameFormGenderWindow.Show();
         }
 
         private async void BtnAddGameCover_Click(object sender, RoutedEventArgs e)
@@ -103,6 +105,20 @@ namespace RetroGamesLauncher.Views
             await LoadImageAndSetSource(ImgGameScreenshotViewer);
         }
 
+        private void BtnAddRom_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+
+            openFileDialog.Filter = "Arquivos de ROM|*.smc;*.sfc;*.gen;*.md;*.gba;*.nes|Todos os Arquivos|*.*";
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                RomPathTextBox.Text = openFileDialog.FileName;
+            }
+        } 
+        #endregion
+
+        #region Manipulação de Imagens
         private async Task LoadImageAndSetSource(Image imageViewer)
         {
             OpenFileDialog openFileDialog = new();
@@ -115,7 +131,7 @@ namespace RetroGamesLauncher.Views
                 {
                     string extension = Path.GetExtension(originalPath);
                     string newFileName = Guid.NewGuid().ToString() + extension;
-                    string newPath = App.Configuration["FilePaths:Images"];                    
+                    string newPath = App.Configuration["FilePaths:Images"];
                     if (imageViewer == ImgGameCoverViewer)
                     {
                         newPath = Path.Combine(newPath, @$"GamesCover\{newFileName}");
@@ -138,39 +154,33 @@ namespace RetroGamesLauncher.Views
                         //File.Copy(originalPath, newPath);
 
                         return bmp;
-                    });                    
-                    imageViewer.Source = bitmap;                    
+                    });
+                    imageViewer.Source = bitmap;
                 }
                 catch (Exception ex)
                 {
                     if (imageViewer == ImgGameCoverViewer)
-                    {                        
+                    {
                         _gameCoverPath = null;
-                        _gameCoverPathOriginal = null;                        
+                        _gameCoverPathOriginal = null;
                     }
                     else if (imageViewer == ImgGameScreenshotViewer)
-                    {                        
+                    {
                         _gameScreenshotPath = null;
-                        _gameScreenshotPathOriginal = null;                       
+                        _gameScreenshotPathOriginal = null;
                     }
                     imageViewer.Source = null;
                     MessageBox.Show("Erro ao carregar a imagem: " + ex.Message);
                 }
             }
-        }
+        }         
+        #endregion
 
-        private void BtnAddRom_Click(object sender, RoutedEventArgs e)
+        #region Métodos Auxiliares
+        private void OnGenderAdded(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-
-            openFileDialog.Filter = "Arquivos de ROM|*.smc;*.sfc;*.gen;*.md;*.gba;*.nes|Todos os Arquivos|*.*";
-
-            // Abre o diálogo e verifica se o usuário selecionou um arquivo
-            if (openFileDialog.ShowDialog() == true)
-            {
-                // Atribui o caminho completo do arquivo à TextBox
-                RomPathTextBox.Text = openFileDialog.FileName;               
-            }
-        }
+            LoadGenders();
+        } 
+        #endregion
     }
 }

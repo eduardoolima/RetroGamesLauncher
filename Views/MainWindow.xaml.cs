@@ -283,7 +283,7 @@ public partial class MainWindow : Window
 
     private void BtnAddGame_Click(object sender, RoutedEventArgs e)
     {
-        var addGameWindow = App.Services.GetRequiredService<AddGame>();
+        var addGameWindow = App.Services.GetRequiredService<GameForm>();
         addGameWindow.Owner = this;
         addGameWindow.Show();
     }

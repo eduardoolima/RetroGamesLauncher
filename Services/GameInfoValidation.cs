@@ -8,7 +8,7 @@ public class GameInfoValidation
     public static bool FormValidate(Window window)
     {
         bool isValid = false;
-        if (window is AddGame addEditGame)
+        if (window is GameForm addEditGame)
         {
             isValid = true;
             addEditGame.TxtTitleFeedBack.Visibility = Visibility.Collapsed;
