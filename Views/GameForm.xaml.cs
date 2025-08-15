@@ -5,6 +5,7 @@ using RetroGamesLauncher.Models;
 using RetroGamesLauncher.Models.AuxModels;
 using RetroGamesLauncher.Models.Enums;
 using RetroGamesLauncher.Services;
+using RetroGamesLauncher.Utils.FormsValidation;
 using RetroGamesLauncher.Views.Shared;
 using System.IO;
 using System.Windows;

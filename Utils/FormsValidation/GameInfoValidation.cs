@@ -1,7 +1,7 @@
 ﻿using RetroGamesLauncher.Views;
 using System.Windows;
 
-namespace RetroGamesLauncher.Services;
+namespace RetroGamesLauncher.Utils.FormsValidation;
 
 public class GameInfoValidation
 {
@@ -20,19 +20,19 @@ public class GameInfoValidation
                 addEditGame.TxtTitleFeedBack.Visibility = Visibility.Visible;
                 addEditGame.TitleTextBox.Focus();
                 isValid = false;
-            }
-            if (addEditGame.RomPathTextBox.Text == string.Empty)
-            {
-                addEditGame.TxtRomPathFeedBack.Text = "Caminho do Rom Obrigatório ⚠️";
-                addEditGame.TxtRomPathFeedBack.Visibility = Visibility.Visible;
-                addEditGame.RomPathTextBox.Focus();
-                isValid = false;
-            }
+            }            
             if (addEditGame.EmulatorComboBox.SelectedIndex < 0)
             {
                 addEditGame.TxtEmulatorFeedBack.Text = "Selecione um Emulador ⚠️";
                 addEditGame.TxtEmulatorFeedBack.Visibility = Visibility.Visible;
                 addEditGame.EmulatorComboBox.Focus();
+                isValid = false;
+            }
+            if (!PathValidation.IsPathValid(addEditGame.RomPathTextBox.Text))
+            {
+                addEditGame.TxtRomPathFeedBack.Text = "Caminho da Rom inválido ⚠️";
+                addEditGame.TxtRomPathFeedBack.Visibility = Visibility.Visible;
+                addEditGame.RomPathTextBox.Focus();
                 isValid = false;
             }
         }        

@@ -3,7 +3,8 @@
 namespace RetroGamesLauncher.Data.Repositories
 {
     public interface IGameGenderRepository
-    {   List<GameGender> GetAll();
+    {   
+        List<GameGender> GetAll();
         GameGender GetById(int id);
         GameGender GetByGender(string title);
         Task<List<GameGender>> GetByGenderLike(string title);

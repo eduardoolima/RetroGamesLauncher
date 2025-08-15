@@ -4,7 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RetroGamesLauncher.Views"
-        xmlns:UserControls="clr-namespace:RetroGamesLauncher.Views.UserControls" 
+        xmlns:TopBar="clr-namespace:RetroGamesLauncher.Views.UserControls" 
+        xmlns:SettingsTabs="clr-namespace:RetroGamesLauncher.Views.UserControls.SettingsTabs" 
         mc:Ignorable="d"
         Title="Settings" Height="450" Width="800"
         Background="#1e1e1e"
@@ -20,7 +21,19 @@
                 <!-- Conteúdo -->
             </Grid.RowDefinitions>
             <!-- BARRA SUPERIOR -->
-            <UserControls:CustomTitleBar Grid.Row="0"/>
+            <TopBar:CustomTitleBar Grid.Row="0"/>
+
+            <TabControl Grid.Row="1" Margin="10">
+                <TabItem Header="Armazenamento"  Style="{StaticResource CustomTabItemStyle}" >
+                    <SettingsTabs:SettingsFilesPath/>
+                </TabItem>
+                <TabItem Header="Jogos"  Style="{StaticResource CustomTabItemStyle}" >
+                    <TextBlock>Teste Jogos</TextBlock>
+                </TabItem>
+                <TabItem Header="Controles"  Style="{StaticResource CustomTabItemStyle}" >
+                    <TextBlock>Teste Controles</TextBlock>
+                </TabItem>
+            </TabControl>
 
         </Grid>
     </Border>
