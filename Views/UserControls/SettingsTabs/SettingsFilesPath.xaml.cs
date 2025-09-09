@@ -124,6 +124,9 @@ public partial class SettingsFilesPath : UserControl
                 }
                 string updatedJson = jsonObject.ToString(Newtonsoft.Json.Formatting.Indented);
                 File.WriteAllText(configFilePath, updatedJson);
+
+                //implementar ~logica para atualizar os caminhos dos jogos no banco de dados e mover os arquivos existentes
+
                 ToastMessages.ShowTemporaryNotification("✔️ Caminhos alterados com sucesso!", TypeToastMessage.Success);
             }
         }
